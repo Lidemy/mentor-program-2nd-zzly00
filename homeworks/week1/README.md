@@ -43,7 +43,7 @@ input: yoyoyo
 output: oyoyoy
 
 input: 1abc2
-output: 2bca1
+output: 2cba1
 
 input 1,2,3,2,1
 output: 1,2,3,2,1
