@@ -4,4 +4,9 @@ function printStars(n) {
   }
 }
 
+
+printStars(1);
+console.log("--------");
+printStars(3);
+console.log("--------");
 printStars(6);

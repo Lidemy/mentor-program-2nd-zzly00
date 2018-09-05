@@ -3,7 +3,7 @@ function reverse(str) {
 	for(var i=str.length-1; i>=0; i--){
 		reverseStr += str[i];
 	}
-	return reverseStr;
+	console.log(reverseStr);
 }
 
 
@@ -14,17 +14,17 @@ function reverse2(str) {
 		reverseStr += str[i];
 		i--;
 	}
-	return reverseStr;
+	console.log(reverseStr);
 }
 
-console.log(reverse("yoyoyo"));
-console.log(reverse("1abc2"));
-console.log(reverse("1,2,3,2,1"));
-console.log(reverse(""));
+reverse("yoyoyo");
+reverse("1abc2");
+reverse("1,2,3,2,1");
+reverse("");
 
 console.log("--------")
 
-console.log(reverse2("yoyoyo"));
-console.log(reverse2("1abc2"));
-console.log(reverse2("1,2,3,2,1"));
-console.log(reverse2(""));
+reverse2("yoyoyo");
+reverse2("1abc2");
+reverse2("1,2,3,2,1");
+reverse2("");
