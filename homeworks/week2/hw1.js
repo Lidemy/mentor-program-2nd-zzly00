@@ -1,5 +1,5 @@
 /*
-// 1
+// 方法1
 function stars(n) {
 	var star = "";
 	var stars = [];
@@ -12,7 +12,7 @@ function stars(n) {
 module.exports = stars;
 */
 
-// 2
+// 方法2
 function stars(n) {
 	var stars = [];
 	for(var i=0; i<n; i++){

@@ -1,5 +1,5 @@
 /*
-// 1
+// 方法1
 function alphaSwap(str) {
 	var strArr = str.split("");
 	var newStr = [];
@@ -13,7 +13,7 @@ function alphaSwap(str) {
 module.exports = alphaSwap
 */
 
-// 2
+// 方法2
 function alphaSwap(str) {
 	return str.split("").map(n => {
 		return n===n.toUpperCase() ? n.toLowerCase() : n.toUpperCase();
