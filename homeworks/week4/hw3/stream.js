@@ -8,16 +8,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	// get data & create innerHTML
 	request.onload = function(){
+		const requestJSON = JSON.parse(request.responseText);
 		if(request.status>=200 && request.status<400){
-			for(let i=0; i<JSON.parse(request.responseText).streams.length; i++){
-				const resp = JSON.parse(request.responseText).streams[i];
-				const url = resp.channel.url;
-				const preview = resp.preview.large;
-				const avatar = resp.channel.logo;
-				const steamName = resp.channel.status;
-				const streamer = resp.channel.display_name;
+			for(let i=0; i<requestJSON.streams.length; i++){
+				const resp = requestJSON.streams[i];
+				const {channel:{url, logo, status, display_name}, preview:{large}} = resp;
 
-				q('.stream-list').innerHTML += getStream(url, preview, avatar, steamName, streamer);
+				q('.stream-list').innerHTML += getStream(url, large, logo, status, display_name);
 			}
 
 			q('.stream-list').innerHTML += `
