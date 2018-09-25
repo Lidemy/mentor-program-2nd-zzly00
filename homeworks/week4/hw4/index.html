@@ -3,19 +3,40 @@
 <head>
 	<meta charset="UTF-8">
 	<title>week4 hw4</title>
+	<style>
+		.title{
+			margin: 10px 50px 0 50px;
+			display: block;
+		}
+		.button{
+			margin-top: 30px;
+			margin-left: 50px;
+			padding: 5px 15px;
+			border-radius: 5px;
+			cursor: pointer;
+			display: inline-block;
+			background: lightblue;
+		}
+	</style>
 	<script type="text/javascript">
-		document.addEventLisenter('DOMConnectLoaded', ()=>{
-			var element = q('.title')
-			element.hide() // 隱藏
-			element.show() // 顯示 
+		document.addEventListener('DOMContentLoaded', ()=>{
+			q('.button').addEventListener('click', ()=>{
+				const element = q('.title');
+				if(element.style.display === 'none'){
+					element.style.display = 'block';
+				}else{
+					element.style.display = 'none';
+				}
+			})
 		})
-
 		function q(element){
 			return document.querySelector(element);
 		}
 	</script>
 </head>
 <body>
+	<div class="button">Hide & Show</div>
+	<h1 class="title">Hello</h1>
 
 </body>
 </html>

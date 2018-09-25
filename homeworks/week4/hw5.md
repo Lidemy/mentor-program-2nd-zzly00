@@ -25,7 +25,7 @@
 ## `GET` 跟 `POST` 有哪些區別，可以試著舉幾個例子嗎？
 
 - GET
-  - 將資料帶在header中，例如：`http://test.com/?id=123`
+  - 將資料帶在query string中，例如：`http://test.com/?id=123`
   - 會自動做 URL encoded
   - 網址有長度限制
   - 不傳敏感資訊，例如：在商品頁面要取得商品圖片、名稱、描述、金額、更多詳細內容...等，`http://test.com/?productId=123`，提供商品id給 Server 取資料，商品id是顯示在網址上也沒影響的資訊
