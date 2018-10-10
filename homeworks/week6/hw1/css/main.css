@@ -1,10 +1,8 @@
-@import url(//fonts.googleapis.com/earlyaccess/notosanstc.css);
-
 /* common */
 body{
     margin: 0;
     background: #fffaf4;
-    font-family: "Noto Sans TC","微軟正黑體","Microsoft JhengHei",sans-serif;
+    font-family: "微軟正黑體","Microsoft JhengHei",sans-serif;
 }
 .container{
     margin: 20px auto;
