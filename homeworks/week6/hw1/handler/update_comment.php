@@ -2,9 +2,13 @@
     require_once('conn.php');
     // 編輯
     if(isset($_POST['c_id']) && isset($_POST['content'])){
+        $stmt = $conn->prepare("SELECT * FROM zzly00_comments C 
+            LEFT JOIN zzly00_users_certificate UC ON C.u_id = UC.u_id
+            WHERE C.c_id = ? AND UC.uc_id = ? AND UC.status = ?;");
         $c_id = $_POST['c_id'];
-        $stmt = $conn->prepare("SELECT * FROM zzly00_comments WHERE c_id = ?;");
-        $stmt->bind_param("s", $c_id);
+        $uc_id = $_COOKIE['uc_id'];
+        $status = 1;
+        $stmt->bind_param("isi", $c_id, $uc_id, $status);
         $stmt->execute();
         $stmt->store_result();
         $row = $stmt->num_rows;
@@ -19,9 +23,13 @@
 
     // 刪除
     if(isset($_POST['c_id']) && !isset($_POST['content'])){
+        $stmt = $conn->prepare("SELECT * FROM zzly00_comments C 
+            LEFT JOIN zzly00_users_certificate UC ON C.u_id = UC.u_id
+            WHERE C.c_id = ? AND UC.uc_id = ? AND UC.status = ?;");
         $c_id = $_POST['c_id'];
-        $stmt = $conn->prepare("SELECT * FROM zzly00_comments WHERE c_id = ?;");
-        $stmt->bind_param("s", $c_id);
+        $uc_id = $_COOKIE['uc_id'];
+        $status = 1;
+        $stmt->bind_param("isi", $c_id, $uc_id, $status);
         $stmt->execute();
         $stmt->store_result();
         $row = $stmt->num_rows;
