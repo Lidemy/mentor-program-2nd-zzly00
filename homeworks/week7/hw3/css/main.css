@@ -1,0 +1,60 @@
+body{
+    margin: 0;
+    padding-top: 5rem;
+}
+.comment__textarea{
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #4E5D6C;
+    border: 1px solid rgba(0,0,0,0.125);
+
+}
+.card{
+    padding-top: 15px;
+}
+.login{
+    padding-bottom: 15px;
+}
+.submit-btn{
+    padding-right: 15px;
+}
+.comment__user{
+    margin: 0;
+}
+.avatar{
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    border-radius: 50%;
+}
+.avatar img{
+    width: 100%;
+    border-radius: 50%;
+    background: #E1E6E0;
+}
+.user__info{
+    margin-left: 7px;
+}
+.btn-sm{
+    margin-left: 5px;
+}
+.container--md{
+    margin: 0 auto;
+    padding: 0;
+}
+.other-link{
+    margin-top: 2rem;
+}
+.other-link a{
+    margin-bottom: 1rem;
+}
+.card--logout,
+.card--register-success{
+    text-align: center;
+}
+#footer{
+    margin-top: 8rem;
+}
+.far.fa-arrow-alt-circle-up{
+    font-size: 36px;
+}
