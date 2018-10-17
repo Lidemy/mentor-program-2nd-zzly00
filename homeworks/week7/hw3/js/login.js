@@ -12,53 +12,19 @@ $('.btn').click(()=>{
     }
 
     if(username && password){
-        const request = new XMLHttpRequest;
-        request.open('POST', 'handler/check_login.php', true);
-        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        request.send('username='+username+'&password='+password);
-        
-        request.onload = () => {
-            if(request.status>=200 && request.status<400){
-                if(request.responseText === 'error'){
+        $.ajax({
+            type: 'POST',
+            url: 'handler/check_login.php',
+            data: 'username='+username+'&password='+password,
+            success: function(resp){
+                if(resp === 'error'){
                     $('.form-control')[0].className = 'form-control is-invalid';
                     $('.invalid-feedback').text('帳號或密碼錯誤，請重新確認');
                 }
-                if(request.responseText === 'success'){
+                if(resp === 'success'){
                     window.location = 'index.php';
                 }
             }
-        }
+        });
     }    
 })
-
-
-// q('.button').addEventListener('click', () => {
-//     const username = q('[name=username]').value;
-//     const password = q('[name=password]').value;
-
-//     for(let i=0; i<qAll('.input').length; i++){
-//         if(!qAll('.input')[i].value){
-//             qAll('.input')[i].style.borderBottom = '1px solid #db4437'
-//             qAll('.input__alert')[i].innerText = '必填欄位';
-//         } 
-//     }
-
-    // if(username && password){
-    //     const request = new XMLHttpRequest;
-    //     request.open('POST', 'handler/check_login.php', true);
-    //     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    //     request.send('username='+username+'&password='+password);
-        
-    //     request.onload = () => {
-    //         if(request.status>=200 && request.status<400){
-    //             if(request.responseText === 'error'){
-    //                 qAll('.input')[0].style.borderBottom = '1px solid #db4437'
-    //                 qAll('.input__alert')[0].innerText = '帳號或密碼錯誤，請重新確認';
-    //             }
-    //             if(request.responseText === 'success'){
-    //                 window.location = 'index.php';
-    //             }
-    //         }
-    //     }
-    // }
-// })

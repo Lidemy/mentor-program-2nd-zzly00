@@ -15,18 +15,17 @@ $('.btn').click(()=>{
     }
 
     if(username && password && nickname){
-        const request = new XMLHttpRequest;
-        request.open('POST', 'handler/check_register.php', true);
-        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        request.send('username='+username+'&password='+password+'&nickname='+nickname+'&avatar='+avatar[Math.floor(Math.random()*6)]);
-
-        request.onload = () => {
-            if(request.status>=200 && request.status<400){
-                if(request.responseText === 'error'){
+        let num = Math.floor(Math.random()*6);
+        $.ajax({
+            type: 'POST',
+            url: 'handler/check_register.php',
+            data: 'username='+username+'&password='+password+'&nickname='+nickname+'&avatar='+avatar[num],
+            success: function(resp){
+                if(resp === 'error'){
                     $('.form-control')[0].className = 'form-control is-invalid';
                     $('.invalid-feedback').text('帳號已存在');
                 }
-                if(request.responseText === 'success'){
+                if(resp === 'success'){
                     let second = 6;
                     function timer(){
                         if(second != 1){
@@ -46,6 +45,6 @@ $('.btn').click(()=>{
                     setTimeout(timer, 0);
                 } 
             }
-        }
+        });
     }
 })

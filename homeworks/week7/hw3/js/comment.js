@@ -12,28 +12,26 @@ function getIndex(pageStart){
     $('.navbar-nav').html('').append(navHTML);
 
     if(uc_id){
-        const request = new XMLHttpRequest;
-        request.open('POST', 'handler/get_login_status.php', true);
-        request.setRequestHeader('Content-type', 'application/x-www-form-urlendcoded');
-        request.send(uc_id);
-
-        request.onload = () => {
-            if(request.status>=200 && request.status<400){
-                if(request.responseText === 'error'){
+        $.ajax({
+            type: 'POST',
+            url: 'handler/get_login_status.php',
+            data: uc_id,
+            success: function(resp) {
+                if(resp === 'error'){
                     getCommentData(getSubLoginHTML(), pageStart);
                     $('.comment__edit').html('').append(getLoginHtml());
                 }else{
-                    const requestJSON = JSON.parse(request.responseText);
+                    const requestJSON = JSON.parse(resp);
                     const nickname = requestJSON[0].nickname;
                     const avatar = requestJSON[0].avatar;
                     const loginHTML = getSubLoginHTML(nickname, avatar);
                     
                     getCommentData(loginHTML, pageStart);
             
-                    $('.comment__edit').html('').append(getLoginHtml(nickname, avatar)); // get comment textarea or login message
-                } 
-            }
-        }
+                    $('.comment__edit').html('').append(getLoginHtml(nickname, avatar));
+                }
+            },
+        });
     }else{
         getCommentData(getSubLoginHTML(), pageStart);
         $('.comment__edit').html('').append(getLoginHtml());
@@ -42,13 +40,11 @@ function getIndex(pageStart){
 
 // get comment data
 function getCommentData(loginHTML, pageStart){
-    const request = new XMLHttpRequest();
-    request.open('POST', 'handler/comment.php', true);
-
-    request.onload = function(){
-        $('.comment__list').html('');
-        if(request.status>=200 && request.status<400){
-            const requestJSON = JSON.parse(request.responseText);
+    $.ajax({
+        type: 'POST',
+        url: 'handler/comment.php',
+        success: function(resp) {
+            const requestJSON = JSON.parse(resp);
             const start = Number(pageStart);
             const pageEnd = (start-1)*10+pageCount > requestJSON.length ? requestJSON.length : (start-1)*10+pageCount;
             
@@ -82,9 +78,8 @@ function getCommentData(loginHTML, pageStart){
 
             $('.edit').click(editComment);
             $('.delete').click(deleteComment);
-        }
-    }
-    request.send();
+        },
+    });
 }
 
 // get comment HTML
@@ -227,20 +222,18 @@ function addComment(e){
     const pageStart = $('.page-item.active').text();
     
     if(parent_id>=0 && comment){
-        const request = new XMLHttpRequest;
-        request.open('POST', 'handler/create_comment.php', true);
-        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        request.send('parent_id='+parent_id+'&content='+comment);
-
-        request.onload = () => {       
-            if(request.status>=200 && request.status<400){
-                if(request.responseText === 'success'){
+        $.ajax({
+            type: 'POST',
+            url: 'handler/create_comment.php',
+            data: 'parent_id='+parent_id+'&content='+comment,
+            success: function(resp) {
+                if(resp === 'success'){
                     getIndex(pageStart);
                 }else{
                     alert('系統錯誤，麻煩請重新確認');
                 }
-            }
-        }
+            },
+        });
     }
 }
 
@@ -307,20 +300,18 @@ function editDone(comment_id){
         const pageStart = $('.page-item.active').text();
 
         if(c_id && comment){
-            const request = new XMLHttpRequest;
-            request.open('POST', 'handler/update_comment.php', true);
-            request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            request.send('c_id='+c_id+'&content='+comment);
-
-            request.onload = () => {
-                if(request.status>=200 && request.status<400){
-                    if(request.responseText === 'success'){
+            $.ajax({
+                type: 'POST',
+                url: 'handler/update_comment.php',
+                data: 'c_id='+c_id+'&content='+comment,
+                success: function(resp){
+                    if(resp === 'success'){
                         getIndex(pageStart);
                     }else{
                         alert('系統錯誤，麻煩請重新確認');
                     }
                 }
-            }
+            });
         }
     })
 }
@@ -332,20 +323,18 @@ function deleteComment(e){
     if(confirmCheck){
         const c_id = $(e.target).prev().prev().val();
 
-        const request = new XMLHttpRequest;
-        request.open('POST', 'handler/update_comment.php', true);
-        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        request.send('c_id='+c_id);
-
-        request.onload = () => {
-            if(request.status>=200 && request.status<400){
-                if(request.responseText === 'success'){
+        $.ajax({
+            type: 'POST',
+            url: 'handler/update_comment.php',
+            data: 'c_id='+c_id,
+            success: function(resp){
+                if(resp === 'success'){
                     const pageStart = $('.page-item.active').text();
                     getIndex(pageStart);
                 }else{
                     alert('系統錯誤，麻煩請重新確認');
                 }
             }
-        }
+        });
     }
 }
