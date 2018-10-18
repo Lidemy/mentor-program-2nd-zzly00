@@ -47,7 +47,7 @@ function getCommentData(loginHTML, pageStart){
             const requestJSON = JSON.parse(resp);
             const start = Number(pageStart);
             const pageEnd = (start-1)*10+pageCount > requestJSON.length ? requestJSON.length : (start-1)*10+pageCount;
-            
+            $('.comment__list').html('');
             for(let i=(start-1)*10; i<pageEnd; i++){
                 let comment = getCommentHTML(requestJSON[i], loginHTML);
                 $('.comment__list').append(comment);
@@ -56,7 +56,7 @@ function getCommentData(loginHTML, pageStart){
 
             // page
             const pageHTML = getPageHTML(requestJSON.length, pageStart);
-            $('.comment__list').append(pageHTML);
+            $('.comment__page').append(pageHTML);
             
             
             $('.page-item').click((e)=>{
@@ -122,8 +122,8 @@ function getSubComment(subcomment){
     let subList = '';
     if(subcomment.length){
         for(let i=0; i<subcomment.length; i++){
-            const {subcomment_id, subcomment_avatar, subcomment_content, subcomment_create_time, subcomment_nickname, subcomment_self_status} = subcomment[i];
-            let subcommentColor = subcomment_self_status ? 'border-primary' : 'bg-primary';
+            const {subcomment_id, subcomment_avatar, subcomment_content, subcomment_create_time, subcomment_nickname, subcomment_self_status, subcomment_comment_sub} = subcomment[i];
+            let subcommentColor = subcomment_comment_sub ? 'border-primary' : 'border-secondary';
             const editAreaHTML = `
                 <div class="row">
                     <input type="hidden" name="c_id" value=${subcomment_id}>
@@ -163,7 +163,7 @@ function getSubLoginHTML(nickname='', avatar=''){
     if(nickname && avatar){
         return `
             <form class="row justify-content-around">
-                <fieldset class="mb-3 col-11 comment__textarea border-primary">
+                <fieldset class="mb-3 col-11 comment__textarea border-secondary">
                     <div class="card-header row align-items-center comment__user">
                         <div class="avatar"><img src="${avatar}" alt=""></div>
                         <div class="row flex-column user__info">
@@ -219,7 +219,7 @@ function addComment(e){
     e.preventDefault();
     const parent_id = $(e.target).parents('.parent').data('num');
     const comment = $(e.target).parent().prev().children().val();
-    const pageStart = $('.page-item.active').text();
+    const pageStart = = $('.page-item.active').text() ? $('.page-item.active').text() : 1;
     
     if(parent_id>=0 && comment){
         $.ajax({
