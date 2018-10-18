@@ -59,14 +59,16 @@
             }else{
                 $self_status = false;
             }
-            
+            $comment_sub = $row['u_id'] === $row['s_u_id'] ? true : false;
+
             $subcomment = array(
                             'subcomment_id' => $row['s_c_id'],
                             'subcomment_avatar' => $row['s_avatar'],
                             'subcomment_nickname' => htmlspecialchars($row['s_nickname'], ENT_QUOTES, 'utf-8'),
                             'subcomment_content' => htmlspecialchars($row['s_content'], ENT_QUOTES, 'utf-8'),
                             'subcomment_create_time' => $row['s_create_time'],
-                            'subcomment_self_status' => $self_status
+                            'subcomment_self_status' => $self_status,
+                            'subcomment_comment_sub' => $comment_sub
                         );
             
             array_push($comment_list[$comment_index]['subcomment'], $subcomment);
