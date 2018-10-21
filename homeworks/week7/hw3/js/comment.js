@@ -56,7 +56,7 @@ function getCommentData(loginHTML, pageStart){
 
             // page
             const pageHTML = getPageHTML(requestJSON.length, pageStart);
-            $('.comment__page').append(pageHTML);
+            $('.comment__page').html('').append(pageHTML);
             
             
             $('.page-item').click((e)=>{
@@ -297,7 +297,7 @@ function editDone(comment_id){
     $('.done').click((e)=>{
         const c_id = comment_id;
         const comment = $(e.target).closest('.comment').children('.card-body').find('.textarea').val();
-        const pageStart = $('.page-item.active').text();
+        const pageStart = $('.page-item.active').text() || 1;
 
         if(c_id && comment){
             $.ajax({
@@ -329,7 +329,7 @@ function deleteComment(e){
             data: 'c_id='+c_id,
             success: function(resp){
                 if(resp === 'success'){
-                    const pageStart = $('.page-item.active').text();
+                    const pageStart = $('.page-item.active').text() || 1;
                     getIndex(pageStart);
                 }else{
                     alert('系統錯誤，麻煩請重新確認');
