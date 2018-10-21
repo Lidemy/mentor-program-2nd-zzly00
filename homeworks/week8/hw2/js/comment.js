@@ -1,16 +1,11 @@
 const url = location.href;
-const page = Number(url.split('page=')[1]);
+const page = Number(url.split('page=')[1]) || 1;
 const qAll = (selector) => {return document.querySelectorAll(selector)};
 const q = (selector) => {return document.querySelector(selector)};
 
 // 顯示在哪一頁
-if(isNaN(page)){
-    qAll('.page')[1].style.backgroundColor = '#7b8b6f';
-    qAll('.page')[1].style.color = '#fff';
-}else{
-    qAll('.page')[page].style.backgroundColor = '#7b8b6f';
-    qAll('.page')[page].style.color = '#fff';
-}
+qAll('.page')[page].style.backgroundColor = '#7b8b6f';
+qAll('.page')[page].style.color = '#fff';
 
 // 判斷上下頁按鈕連結
 const pageUrl = {
