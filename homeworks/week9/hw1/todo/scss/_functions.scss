@@ -1,0 +1,14 @@
+// font-size
+$base-size: 16px;
+$size-level: 2px;
+@function font($level: 0){
+    @if $level<0{
+        $level: 0;
+    }
+    @return $base-size + $size-level * round($level);
+}
+
+// gray
+@function gray($level: 0%){
+    @return darken(#fff, $level);
+}
