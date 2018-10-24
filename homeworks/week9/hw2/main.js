@@ -1,3 +1,5 @@
+// 舊寫法
+/*
 function Stack(){
     const list = [];
     return {
@@ -12,7 +14,6 @@ function Stack(){
         }
     }
 }
-
 function Queue(){
     let list = [];
     return {
@@ -26,6 +27,34 @@ function Queue(){
             return num;
         }
     }
+}
+*/
+
+// 物件導向
+function Stack(){
+    this.list = [];
+}
+Stack.prototype.push = function(n){
+    const index = this.list.length || 0;
+    this.list[index] = n;
+}
+Stack.prototype.pop = function(){
+    const num = this.list[this.list.length-1];
+    this.list.splice(this.list.length-1, 1);
+    return num;
+}
+
+function Queue(){
+    this.list = [];
+}
+Queue.prototype.push = function(n){
+    const index = this.list.length || 0;
+    this.list[index] = n;
+}
+Queue.prototype.pop = function(){
+    const [num, ...rest] = this.list;
+    this.list = rest;
+    return num;
 }
 
 // first in, last out

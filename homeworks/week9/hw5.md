@@ -8,7 +8,7 @@
 - Cache-Control: no-cache，發出 request 確認是否有新檔案，若有，則 response 新檔案；若無，則直接從 cache 取。
 
 ## Stack 跟 Queue 的差別是什麼？
-- stack：先進後出 first in, last out，Event Loop 會先確認 stack 有沒有任務，若有則優先處理 stack，當 stack 中都沒有任務後，則會將 queue 的任務放進 stack 中。
+- stack：先進後出 first in, last out
 - queue：先進先出 first in, first out
 
 ## 請去查詢資料並解釋 CSS Selector 的權重是如何計算的（不要複製貼上，請自己思考過一遍再自己寫出來）
