@@ -1,0 +1,153 @@
+@import "functions";
+
+$title-font: 'Raleway', sans-serif;
+$body-bg-color: gray(5%);
+$primary-color: #ff9280;
+$primary-color-dark: #fa6a51;
+
+$white: gray();
+$light-gray: gray(20%);
+$gray: gray(30%);
+$dark-gary: gray(35%);
+
+// btn
+@mixin btn($bg-color, $position: relative){
+    cursor: pointer;
+    outline: 0;
+    border: 0;
+    font-size: font();
+    color: $white;
+    background-color: $bg-color;
+    position: $position;
+    top: 0;
+    right: 0;
+}
+
+// btn done style
+%btn-done{
+    border: 2px solid $primary-color-dark;
+    background: $primary-color;
+}
+
+
+// style
+body{
+    margin: 0;
+    padding: 0;
+    background: $body-bg-color;
+}
+.container{
+    margin: 0 auto;
+    margin-bottom: 30px;
+    width: 95%;
+    text-align: center;
+}
+.title{
+    margin: 0;
+    font-family: $title-font;
+    font-size: font(24);
+    color: $primary-color;
+    font-weight: 100;
+}
+.list{
+    background: $white;
+    text-align: left;
+    position: relative;
+    &__input__text{
+        padding: 8px 65px 8px 10px;
+        width: 100%;
+        font-size: font(2);
+        box-sizing: border-box;
+        border: 0;
+        border-bottom: 1px solid $gray;
+        outline: 0;
+        &::placeholder{
+            color: $light-gray;
+            opacity: 1;
+        }
+    }
+    &__input__btnAdd{
+        @include btn($primary-color, absolute);
+        height: 39px;
+        &:hover{
+            background: $primary-color-dark;
+        }
+    }
+}
+.item{
+    padding-left: 10px;
+    min-height: 42px;
+    box-sizing: border-box;
+    border-bottom: 1px solid $light-gray;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    &:hover{
+        box-shadow: 0 0 5px 5px rgba(0,0,0,0.1);
+        z-index: 1;
+    }
+}
+.done{
+    cursor: pointer;
+    outline: 0;
+    border: 2px solid $gray;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    &--pink{
+        @extend %btn-done;
+    }
+    &:active{
+        @extend %btn-done;
+    }
+}
+.content{
+    margin: 5px 0;
+    padding: 0 5px;
+    width: 100%;
+    font-size: font();
+    box-sizing: border-box;
+    &-done{
+        color: $gray;
+        font-style: italic;
+        text-decoration: line-through;
+    }
+}
+.delete{
+    margin-right: 10px;
+    color: $light-gray;
+    visibility: visible; 
+    cursor: pointer;
+    &:hover{
+        color: $dark-gary;
+    }
+}
+
+@media screen and (min-width: 576px){
+    .container{
+        max-width: 700px;
+    }
+    .title{
+        font-size: font(35);
+    }
+    .list__input{
+        &__text{
+            font-size: font(4);
+        }
+        &__btnAdd{
+            font-size: font(2);
+            height: 45px;
+        }
+    }
+    .content,
+    .delete{
+        font-size: font(2);
+    }
+    .delete{
+        visibility: hidden;
+    }
+    .item:hover > .delete{
+        visibility: visible;
+    }
+}
