@@ -1,3 +1,6 @@
+import '../scss/_functions.scss';
+import '../scss/style.scss';
+
 let listItem = JSON.parse(localStorage.getItem('items')) || [];
 
 function showItemList(){
