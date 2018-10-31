@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('head')%>
+</head>
+<body>
+    <%- include('navbar')%>
+    <div class="card bg-dark mb-3 container--md" style="max-width: 45rem;">
+        <h1 class="card-header">註冊</h1>
+        <div class="card-body">
+            <form>
+                <fieldset>
+                    <div class="form-group has-danger">
+                        <label for="username">帳號</label>
+                        <input type="text" class="form-control" name="username" maxlength="20" placeholder="請輸入帳號">
+                        <div class="invalid-feedback">必填</div>
+                    </div>
+                    <div class="form-group has-danger">
+                        <label for="password">密碼</label>
+                        <input type="password" class="form-control" name="password" maxlength="20" placeholder="請輸入密碼">
+                        <div class="invalid-feedback">必填</div>
+                    </div>
+                    <div class="form-group has-danger">
+                        <label for="nickname">暱稱</label>
+                        <input type="nickname" class="form-control" name="nickname" maxlength="32" placeholder="請輸入暱稱">
+                        <div class="invalid-feedback">必填</div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <button type="button" class="btn btn-primary">註冊</button>
+                    </div>
+                </fieldset>
+                <div class="row align-items-center flex-column other-link">
+                    <a href="/login">已有會員帳號，我要登入</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <%- include('footer')%>
+    <%- include('scripts')%>
+    <script src="./js/register.js"></script>
+</body>
+</html>
