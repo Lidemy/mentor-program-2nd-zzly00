@@ -219,7 +219,7 @@ function addComment(e){
     e.preventDefault();
     const parent_id = $(e.target).parents('.parent').data('num');
     const comment = $(e.target).parent().prev().children().val();
-    const pageStart = = $('.page-item.active').text() ? $('.page-item.active').text() : 1;
+    const pageStart = $('.page-item.active').text() ? $('.page-item.active').text() : 1;
     
     if(parent_id>=0 && comment){
         $.ajax({
