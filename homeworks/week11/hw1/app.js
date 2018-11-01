@@ -18,7 +18,6 @@ app.set('view engine', 'ejs');
 const renderController = require('./controller/renderController');
 const userController = require('./controller/userController');
 const commentController = require('./controller/commentController');
-
 // render
 app.get('/', renderController.index);
 app.get('/login', renderController.login);

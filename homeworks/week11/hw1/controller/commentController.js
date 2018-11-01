@@ -1,15 +1,13 @@
 const query = require('../model/query');
-const db = require('../model/db');
 const he = require('he');
 const moment = require("moment-timezone");
 
 module.exports = {
     handleComments: (req, res) => {
-        const sql = query.commentsQuery;
-        db.conn(sql, [], (err, rows) => {
+        query.commentsQuery((err, rows) => {
             let data = [];
             rows.map((row) => {
-                const authorStatus = req.session.uId === row.u_id ? true : false;
+                const authorStatus = req.session.uId === row.u_id
                 const comments = {
                     cId: row.c_id,
                     avatar: row.avatar,
@@ -24,8 +22,8 @@ module.exports = {
                 }
 
                 if(data[data.length-1].cId === row.c_id && row.s_c_id != null){
-                    const sAuthorStatus = req.session.uId === row.s_u_id ? true : false;
-                    const sCommentSub = row.u_id === row.s_u_id ? true : false;
+                    const sAuthorStatus = req.session.uId === row.s_u_id
+                    const sCommentSub = row.u_id === row.s_u_id
                     const subcomments = {
                         sCId: row.s_c_id,
                         sAvatar: row.s_avatar,
@@ -42,9 +40,8 @@ module.exports = {
         })
     },
     handleLoginStatus: (req, res) => {
-        const sql = query.userInfoQuery;
-        const insertsArr = [req.session.uId];
-        db.conn(sql, insertsArr, (err, rows) => {
+        const insertsArr = [req.session.uId]
+        query.userInfoQuery(insertsArr,(err, rows) => {
             if(Array.isArray(rows) && rows.length !== 0){
                 let data = {
                     nickname: rows[0].nickname,
@@ -58,9 +55,8 @@ module.exports = {
     },
     handleCreate: (req, res) => {
         if(req.session.uId){
-            const sql = query.createCommentQuery;
             const insertsArr = [req.session.uId, req.body.content, req.body.parentId];
-            db.conn(sql, insertsArr, (err, rows) => {
+            query.createCommentQuery(insertsArr, (err, rows) => {
                 rows.affectedRows ? res.send('success') : res.send('error');
             })
         }else{
@@ -68,13 +64,12 @@ module.exports = {
         }
     },
     handleUpdate: (req, res) => {
-        const sql = query.checkAuthorQuery;
         const insertsArr = [req.body.cId, req.session.uId];
-        db.conn(sql, insertsArr, (err, rows) => {
+        query.checkAuthorQuery(insertsArr, (err, rows) => {
             if(rows[0].c_id){
-                const sql = req.body.content ? query.updateCommentQuery : query.deleteCommentQuery;
+                const func = req.body.content ? query.updateCommentQuery : query.deleteCommentQuery;
                 const insertsArr = req.body.content ? [req.body.content, req.body.cId] : [req.body.cId];
-                db.conn(sql, insertsArr, (err, rows) => {
+                func(insertsArr, (err, rows) => {
                     rows.affectedRows ? res.send('success') : res.send('error');
                 })
             }else{
