@@ -3,8 +3,7 @@ const bcrypt = require('bcrypt');
 
 module.exports = {
     handleLogin: (req, res) => {
-        const insertsArr = [req.body.username]
-        query.loginQuery(insertsArr, (err, rows) => {
+        query.loginQuery(req.body.username, (err, rows) => {
             if(rows[0].password && bcrypt.compareSync(req.body.password, rows[0].password)){
                 req.session.uId = rows[0].u_id;
                 res.send('success');
@@ -14,8 +13,7 @@ module.exports = {
         })
     },
     handleRegister: (req, res) => {
-        const insertsArr = [req.body.username, bcrypt.hashSync(req.body.password, 10), req.body.nickname, req.body.avatar];
-        query.createUserQuery(insertsArr, (err, rows) => {
+        query.createUserQuery(req.body.username, bcrypt.hashSync(req.body.password, 10), req.body.nickname, req.body.avatar, (err, rows) => {
             if(err){
                 res.send('error');
             }else{

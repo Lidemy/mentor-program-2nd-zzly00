@@ -2,26 +2,27 @@ const pageCount = 10;
 
 window.addEventListener('load',getIndex(1))
 
-function getIndex(pageStart){
+function getIndex(currentPage){
     $.ajax({
         type: 'GET',
         url: '/v1/loginstatus',
         success: function(resp) {
             if(!resp){
-                getCommentData(getSubLoginHTML(), pageStart);
+                getCommentData(getSubLoginHTML(), currentPage);
+                getPageData(currentPage);
                 $('.comment__edit').html('').append(getLoginHtml());
                 $('.navbar-nav')
                     .html('')
                     .append(`<li class="nav-item"><a class="nav-link" href="/login">登入</a></li>
                         <li class="nav-item"><a class="nav-link" href="/register">註冊</a></li>`);  
             }else{
-                
                 const nickname = resp.nickname;
                 const avatar = resp.avatar;
                 const loginHTML = getSubLoginHTML(nickname, avatar);
                 
-                getCommentData(loginHTML, pageStart);
-        
+                getCommentData(loginHTML, currentPage);
+                getPageData(currentPage);
+
                 $('.comment__edit').html('').append(getLoginHtml(nickname, avatar));
                 $('.navbar-nav')
                     .html('')
@@ -32,46 +33,18 @@ function getIndex(pageStart){
 }
 
 // get comment data
-function getCommentData(loginHTML, pageStart){
-    console.log('comment.js 1')
+function getCommentData(loginHTML, currentPage){
+    const pageStart = (currentPage-1) * 10
     $.ajax({
         type: 'GET',
-        url: '/v1/comments',
+        url: `/v1/comments?start=${pageStart}&limit=${pageCount}`,
         success: function(resp) {
-            const start = Number(pageStart);
-            const pageEnd = (start-1)*10+pageCount > resp.length ? resp.length : (start-1)*10+pageCount;
             $('.comment__list').html('');
-            for(let i=(start-1)*10; i<pageEnd; i++){
-                let comment = getCommentHTML(resp[i], loginHTML);
+            resp.map(data => {
+                let comment = getCommentHTML(data, loginHTML);
                 $('.comment__list').append(comment);
-            }
-            $(':submit').click(addComment);
-
-            // page
-            const pageHTML = getPageHTML(resp.length, pageStart);
-            $('.comment__page').html('').append(pageHTML);
-            
-            
-            $('.page-item').click((e)=>{
-                let page;
-                const lastPage = Math.ceil(resp.length/10);
-                if(($(e.target).text() === '«' && $('.page-item.active').text() == '1') || $(e.target).text() === '»' && $('.page-item.active').text() == lastPage){
-                    return;
-                }else if($(e.target).text() === '«'){
-                    page = Number($('.page-item.active').text()) -1;
-                }else if($(e.target).text() === '»'){
-                    page = Number($('.page-item.active').text()) +1;
-                }else{
-                    page = $(e.target).text();
-                }
-
-                getIndex(page);
-                window.scrollTo(0, 0);
-            });
-
-            $('.edit').click(editComment);
-            $('.delete').click(deleteComment);
-        },
+            })
+        }
     });
 }
 
@@ -207,12 +180,40 @@ function getLoginHtml(nickname='', avatar=''){
     }
 }
 
+// btns
+$('.container').click((e) => {
+    if(e.target.innerText == '送出'){
+        addComment(e);
+    }else if(e.target.innerText == '編輯'){
+        editComment(e);
+    }else if(e.target.innerText == '編輯完成'){
+        editDone(e);
+    }else if(e.target.innerText == '刪除'){
+        deleteComment(e);
+    }else if(Number(e.target.innerText)){
+        getIndex(e.target.innerText);
+        window.scrollTo(0, 0);
+    }else if((e.target.innerText === '«' && $('.page-item.active').text() == '1') || ($(e.target).text() === '»' && $($(":contains('»')")[$(":contains('»')").length-2]).prev()[0].innerText)){
+        return;
+    }else if(e.target.innerText === '«'){
+        page = Number($('.page-item.active').text()) -1;
+        getIndex(page);
+        window.scrollTo(0, 0);
+    }else if(e.target.innerText === '»'){
+        page = Number($('.page-item.active').text()) +1;
+        getIndex(page);
+        window.scrollTo(0, 0);
+    }else{
+        return;
+    }
+});
+
 // add comment
 function addComment(e){
     e.preventDefault();
     const parent_id = $(e.target).parents('.parent').data('num');
     const comment = $(e.target).parent().prev().children().val();
-    const pageStart = $('.page-item.active').text() ? $('.page-item.active').text() : 1;
+    const pageStart = $('.page-item.active').text() || 1;
     
     if(parent_id>=0 && comment){
         $.ajax({
@@ -220,7 +221,6 @@ function addComment(e){
             url: '/v1/comments',
             data: 'parentId='+parent_id+'&content='+comment,
             success: function(resp) {
-                console.log(resp)
                 if(resp === 'success'){
                     getIndex(pageStart);
                 }else{
@@ -229,6 +229,20 @@ function addComment(e){
             },
         });
     }
+}
+
+// get page data
+function getPageData(currentPage){
+    console.log('aaa')
+    $.ajax({
+        type: 'GET',
+        url: '/v1/pages',
+        success: function(resp) {
+            console.log(currentPage)
+            const pageHTML = getPageHTML(resp.amount, currentPage);
+            $('.comment__page').html('').append(pageHTML);
+        }
+    });
 }
 
 // get page HTML
@@ -287,27 +301,24 @@ function editComment(e){
 }
 
 // 完成
-function editDone(comment_id){
-    $('.done').click((e)=>{
-        const c_id = comment_id;
-        const comment = $(e.target).closest('.comment').children('.card-body').find('.textarea').val();
-        const pageStart = $('.page-item.active').text() || 1;
-
-        if(c_id && comment){
-            $.ajax({
-                type: 'PUT',
-                url: '/v1/comments',
-                data: 'cId='+c_id+'&content='+comment,
-                success: function(resp){
-                    if(resp === 'success'){
-                        getIndex(pageStart);
-                    }else{
-                        alert('系統錯誤，麻煩請重新確認');
-                    }
+function editDone(e){
+    const c_id = $(e.target).prev().val();
+    const comment = $(e.target).closest('.comment').children('.card-body').find('.textarea').val();
+    const currentPage = $('.page-item.active').text() || 1;
+    if(c_id && comment){
+        $.ajax({
+            type: 'PUT',
+            url: '/v1/comments',
+            data: 'cId='+c_id+'&content='+comment,
+            success: function(resp){
+                if(resp === 'success'){
+                    getIndex(currentPage);
+                }else{
+                    alert('系統錯誤，麻煩請重新確認');
                 }
-            });
-        }
-    })
+            }
+        });
+    }
 }
 
 // 刪除
@@ -316,15 +327,14 @@ function deleteComment(e){
     
     if(confirmCheck){
         const c_id = $(e.target).prev().prev().val();
-
         $.ajax({
             type: 'DELETE',
             url: '/v1/comments',
             data: 'cId='+c_id,
             success: function(resp){
                 if(resp === 'success'){
-                    const pageStart = $('.page-item.active').text() || 1;
-                    getIndex(pageStart);
+                    const currentPage = $('.page-item.active').text() || 1;
+                    getIndex(currentPage);
                 }else{
                     alert('系統錯誤，麻煩請重新確認');
                 }
