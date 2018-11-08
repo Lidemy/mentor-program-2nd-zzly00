@@ -4,7 +4,7 @@ const moment = require("moment-timezone");
 
 module.exports = {
     handleComments: (req, res) => {
-        query.commentsQuery((err, rows) => {
+        query.commentsQuery(req.query.start, req.query.limit, (err, rows) => {
             let data = [];
             rows.map((row) => {
                 const authorStatus = req.session.uId === row.u_id
@@ -40,8 +40,7 @@ module.exports = {
         })
     },
     handleLoginStatus: (req, res) => {
-        const insertsArr = [req.session.uId]
-        query.userInfoQuery(insertsArr,(err, rows) => {
+        query.userInfoQuery(req.session.uId, (err, rows) => {
             if(Array.isArray(rows) && rows.length !== 0){
                 let data = {
                     nickname: rows[0].nickname,
@@ -55,8 +54,7 @@ module.exports = {
     },
     handleCreate: (req, res) => {
         if(req.session.uId){
-            const insertsArr = [req.session.uId, req.body.content, req.body.parentId];
-            query.createCommentQuery(insertsArr, (err, rows) => {
+            query.createCommentQuery(req.session.uId, req.body.content, req.body.parentId, (err, rows) => {
                 rows.affectedRows ? res.send('success') : res.send('error');
             })
         }else{
@@ -64,16 +62,23 @@ module.exports = {
         }
     },
     handleUpdate: (req, res) => {
-        const insertsArr = [req.body.cId, req.session.uId];
-        query.checkAuthorQuery(insertsArr, (err, rows) => {
+        query.checkAuthorQuery(req.body.cId, req.session.uId, (err, rows) => {
             if(rows[0].c_id){
                 const func = req.body.content ? query.updateCommentQuery : query.deleteCommentQuery;
-                const insertsArr = req.body.content ? [req.body.content, req.body.cId] : [req.body.cId];
-                func(insertsArr, (err, rows) => {
+                func(req.body.content, req.body.cId, (err, rows) => {
                     rows.affectedRows ? res.send('success') : res.send('error');
                 })
             }else{
                 res.send('error');
+            }
+        })
+    },
+    handlePages: (req, res) => {
+        query.pagesQuery((err, rows) => {
+            if(Array.isArray(rows) && rows.length !== 0){
+                res.send(rows[0]);
+            }else{
+                res.send(false);
             }
         })
     }

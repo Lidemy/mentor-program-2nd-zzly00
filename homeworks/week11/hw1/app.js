@@ -32,6 +32,6 @@ app.post('/v1/comments', commentController.handleCreate);
 app.put('/v1/comments', commentController.handleUpdate);
 app.delete('/v1/comments', commentController.handleUpdate);
 app.get('/v1/loginstatus', commentController.handleLoginStatus);
-
+app.get('/v1/pages', commentController.handlePages);
 
 app.listen(3000);
