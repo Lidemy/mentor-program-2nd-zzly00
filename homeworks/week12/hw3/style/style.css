@@ -1,0 +1,10 @@
+@media screen and (min-width: 768px) {
+  .col-md-6{
+    max-width: 48.5555555%;
+  }
+}
+@media screen and (min-width: 992px) {
+  .col-lg-4{
+    max-width: 32.333333%;
+  }
+}
