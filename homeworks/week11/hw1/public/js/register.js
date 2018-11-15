@@ -16,16 +16,25 @@ $('.btn').click(()=>{
 
     if(username && password && nickname){
         let num = Math.floor(Math.random()*6);
-        $.ajax({
-            type: 'POST',
-            url: '/v1/register',
-            data: 'username='+username+'&password='+password+'&nickname='+nickname+'&avatar='+avatar[num],
-            success: function(resp){
-                if(resp === 'error'){
+        fetch('/v1/register', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: username,
+                password: password,
+                nickname: nickname,
+                avatar: avatar[num]
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(resp => resp.json())
+            .then(data => {
+                if(data.status === 'error'){
                     $('.form-control')[0].className = 'form-control is-invalid';
                     $('.invalid-feedback').text('帳號已存在');
                 }
-                if(resp === 'success'){
+                if(data.status === 'success'){
                     let second = 6;
                     function timer(){
                         if(second != 1){
@@ -44,7 +53,6 @@ $('.btn').click(()=>{
                     }
                     setTimeout(timer, 0);
                 } 
-            }
-        });
+            })
     }
 })

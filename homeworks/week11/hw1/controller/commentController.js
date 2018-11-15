@@ -1,6 +1,7 @@
 const query = require('../model/query');
 const he = require('he');
 const moment = require("moment-timezone");
+const share = require('./share');
 
 module.exports = {
     handleComments: (req, res) => {
@@ -13,7 +14,7 @@ module.exports = {
                     avatar: row.avatar,
                     content: he.escape(row.content),
                     createTime: moment(row.create_time).tz('Asia/Taipei').format('YYYY-MM-DD hh:mm:ss a'),
-                    nickname: row.nickname,
+                    nickname: he.escape(row.nickname),
                     authorStatus: authorStatus,
                     subcomment: []
                 }
@@ -29,36 +30,36 @@ module.exports = {
                         sAvatar: row.s_avatar,
                         sContent: he.escape(row.s_content),
                         sCreateTime: moment(row.s_create_time).tz('Asia/Taipei').format('YYYY-MM-DD hh:mm:ss a'),
-                        sNickname: row.s_nickname,
+                        sNickname: he.escape(row.s_nickname),
                         sAuthorStatus: sAuthorStatus,
                         sCommentSub: sCommentSub
                     }
                     data[data.length-1].subcomment.push(subcomments);
                 }
             })
-            res.send(data);
+            res.send(share.shareResp('success', data));
         })
     },
     handleLoginStatus: (req, res) => {
         query.userInfoQuery(req.session.uId, (err, rows) => {
             if(Array.isArray(rows) && rows.length !== 0){
                 let data = {
-                    nickname: rows[0].nickname,
+                    nickname: he.escape(rows[0].nickname),
                     avatar: rows[0].avatar
                 }
-                res.send(data);
+                res.send(share.shareResp('success', data));
             }else{
-                res.send(false);
+                res.send(share.shareResp('error'));
             }
         })
     },
     handleCreate: (req, res) => {
         if(req.session.uId){
             query.createCommentQuery(req.session.uId, req.body.content, req.body.parentId, (err, rows) => {
-                rows.affectedRows ? res.send('success') : res.send('error');
+                rows.affectedRows ? res.send(share.shareResp('success')) : res.send(share.shareResp('error'));
             })
         }else{
-            res.send('error');
+            res.send(share.shareResp('error'))
         }
     },
     handleUpdate: (req, res) => {
@@ -66,19 +67,19 @@ module.exports = {
             if(rows[0].c_id){
                 const func = req.body.content ? query.updateCommentQuery : query.deleteCommentQuery;
                 func(req.body.content, req.body.cId, (err, rows) => {
-                    rows.affectedRows ? res.send('success') : res.send('error');
+                    rows.affectedRows ? res.send(share.shareResp('success')) : res.send(share.shareResp('error'));
                 })
             }else{
-                res.send('error');
+                res.send(share.shareResp('error'));
             }
         })
     },
     handlePages: (req, res) => {
         query.pagesQuery((err, rows) => {
             if(Array.isArray(rows) && rows.length !== 0){
-                res.send(rows[0]);
+                res.send(share.shareResp('success', rows[0]));
             }else{
-                res.send(false);
+                res.send(share.shareResp('error'));
             }
         })
     }

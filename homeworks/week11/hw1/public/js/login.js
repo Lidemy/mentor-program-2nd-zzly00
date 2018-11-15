@@ -12,19 +12,25 @@ $('.btn').click(()=>{
     }
 
     if(username && password){
-        $.ajax({
-            type: 'POST',
-            url: '/v1/login',
-            data: 'username='+username+'&password='+password,
-            success: function(resp){
-                if(resp === 'error'){
+        fetch('/v1/login', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: username,
+                password: password
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(resp => resp.json())
+            .then(data => {
+                if(data.status === 'error'){
                     $('.form-control')[0].className = 'form-control is-invalid';
                     $('.invalid-feedback').text('帳號或密碼錯誤，請重新確認');
                 }
-                if(resp === 'success'){
+                if(data.status === 'success'){
                     window.location = '/';
                 }
-            }
-        });
+            })
     }    
 })

@@ -3,11 +3,10 @@ const pageCount = 10;
 window.addEventListener('load',getIndex(1))
 
 function getIndex(currentPage){
-    $.ajax({
-        type: 'GET',
-        url: '/v1/loginstatus',
-        success: function(resp) {
-            if(!resp){
+    fetch('/v1/loginstatus')
+        .then(resp => resp.json())
+        .then(resp => {
+            if(resp.status === 'error'){
                 getCommentData(getSubLoginHTML(), currentPage);
                 getPageData(currentPage);
                 $('.comment__edit').html('').append(getLoginHtml());
@@ -16,8 +15,9 @@ function getIndex(currentPage){
                     .append(`<li class="nav-item"><a class="nav-link" href="/login">登入</a></li>
                         <li class="nav-item"><a class="nav-link" href="/register">註冊</a></li>`);  
             }else{
-                const nickname = resp.nickname;
-                const avatar = resp.avatar;
+                const {data} = resp
+                const nickname = data.nickname;
+                const avatar = data.avatar;
                 const loginHTML = getSubLoginHTML(nickname, avatar);
                 
                 getCommentData(loginHTML, currentPage);
@@ -28,24 +28,27 @@ function getIndex(currentPage){
                     .html('')
                     .append(`<li class="nav-item"><a class="nav-link" href="/logout">登出</a></li>`);
             }
-        },
-    });
+        })
+        .catch(err => console.log(err))
 }
 
 // get comment data
 function getCommentData(loginHTML, currentPage){
     const pageStart = (currentPage-1) * 10
-    $.ajax({
-        type: 'GET',
-        url: `/v1/comments?start=${pageStart}&limit=${pageCount}`,
-        success: function(resp) {
-            $('.comment__list').html('');
-            resp.map(data => {
-                let comment = getCommentHTML(data, loginHTML);
-                $('.comment__list').append(comment);
-            })
-        }
-    });
+    fetch(`/v1/comments?start=${pageStart}&limit=${pageCount}`)
+        .then(resp => resp.json())
+        .then(resp => {
+            if(resp.status === 'success'){
+                $('.comment__list').html('');
+                resp.data.map(Info => {
+                    let comment = getCommentHTML(Info, loginHTML);
+                    $('.comment__list').append(comment);
+                })
+            }else{
+                alert('系統錯誤，麻煩請稍後再試');
+            } 
+        })
+        .catch(err => console.log(err))
 }
 
 // get comment HTML
@@ -55,7 +58,7 @@ function getCommentHTML(data, loginHTML){
     const editAreaHTML = `
                 <div class="row">
                     <input type="hidden" name="c_id" value=${cId}>
-                    <button type="button" class="btn btn-primary btn-sm edit">編輯</button>
+                    <button type="button" class="btn btn-primary btn-sm edit edit-change">編輯</button>
                     <button type="button" class="btn btn-primary btn-sm delete">刪除</button>
                 </div>
             `;
@@ -93,7 +96,7 @@ function getSubComment(subcomment){
             const editAreaHTML = `
                 <div class="row">
                     <input type="hidden" name="c_id" value=${sCId}>
-                    <button type="button" class="btn btn-primary btn-sm edit">編輯</button>
+                    <button type="button" class="btn btn-primary btn-sm edit edit-change">編輯</button>
                     <button type="button" class="btn btn-primary btn-sm delete">刪除</button>
                 </div>
             `;
@@ -139,7 +142,7 @@ function getSubLoginHTML(nickname='', avatar=''){
                     <div class="form-group">
                         <textarea class="form-control textarea" rows="3" style="margin-top: 10px; margin-bottom: 0px; height: 100px;"></textarea>
                     </div>
-                    <div class="row justify-content-end submit-btn"><button type="submit" class="btn btn-primary">送出</button></div>
+                    <div class="row justify-content-end submit-btn"><button type="submit" class="btn btn-primary submit">送出</button></div>
                 </fieldset>
             </form>
         `;
@@ -167,7 +170,7 @@ function getLoginHtml(nickname='', avatar=''){
                     <div class="form-group">
                         <textarea class="form-control textarea" rows="3" style="margin-top: 10px; margin-bottom: 0px; height: 207px;"></textarea>
                     </div>
-                    <div class="row justify-content-end submit-btn"><button type="submit" class="btn btn-primary">送出</button></div>
+                    <div class="row justify-content-end submit-btn"><button type="submit" class="btn btn-primary submit">送出</button></div>
                 </fieldset>
             </form>
         `;
@@ -182,24 +185,24 @@ function getLoginHtml(nickname='', avatar=''){
 
 // btns
 $('.container').click((e) => {
-    if(e.target.innerText == '送出'){
+    if($(event.target).hasClass('submit')){
         addComment(e);
-    }else if(e.target.innerText == '編輯'){
+    }else if($(event.target).hasClass('edit-change')){
         editComment(e);
-    }else if(e.target.innerText == '編輯完成'){
+    }else if($(event.target).hasClass('done')){
         editDone(e);
-    }else if(e.target.innerText == '刪除'){
+    }else if($(event.target).hasClass('delete')){
         deleteComment(e);
-    }else if(Number(e.target.innerText)){
+    }else if($(event.target).hasClass('page-number')){
         getIndex(e.target.innerText);
         window.scrollTo(0, 0);
-    }else if((e.target.innerText === '«' && $('.page-item.active').text() == '1') || ($(e.target).text() === '»' && $($(":contains('»')")[$(":contains('»')").length-2]).prev()[0].innerText)){
+    }else if(($(event.target).hasClass('page-pre') && $('.page-item.active').text() == '1') || ($(event.target).hasClass('page-next') && $('.pagination')[0].children.length-2 == $('.page-item.active').text())){
         return;
-    }else if(e.target.innerText === '«'){
+    }else if($(event.target).hasClass('page-pre')){
         page = Number($('.page-item.active').text()) -1;
         getIndex(page);
         window.scrollTo(0, 0);
-    }else if(e.target.innerText === '»'){
+    }else if($(event.target).hasClass('page-next')){
         page = Number($('.page-item.active').text()) +1;
         getIndex(page);
         window.scrollTo(0, 0);
@@ -214,35 +217,44 @@ function addComment(e){
     const parent_id = $(e.target).parents('.parent').data('num');
     const comment = $(e.target).parent().prev().children().val();
     const pageStart = $('.page-item.active').text() || 1;
-    
     if(parent_id>=0 && comment){
-        $.ajax({
-            type: 'POST',
-            url: '/v1/comments',
-            data: 'parentId='+parent_id+'&content='+comment,
-            success: function(resp) {
-                if(resp === 'success'){
+        fetch('/v1/comments', {
+            method: 'POST',
+            body: JSON.stringify({
+                parentId: parent_id,
+                content: comment
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(resp => resp.json())
+            .then(resp => {
+                if(resp.status === 'success'){
                     getIndex(pageStart);
                 }else{
                     alert('系統錯誤，麻煩請重新確認');
                 }
-            },
-        });
+            })
+            .catch(err => console.log(err))
     }
 }
 
 // get page data
 function getPageData(currentPage){
-    console.log('aaa')
-    $.ajax({
-        type: 'GET',
-        url: '/v1/pages',
-        success: function(resp) {
-            console.log(currentPage)
-            const pageHTML = getPageHTML(resp.amount, currentPage);
-            $('.comment__page').html('').append(pageHTML);
-        }
-    });
+    fetch('/v1/pages')
+        .then(resp => resp.json())
+        .then(resp => {
+            const {status, data} = resp
+            if(status === 'success'){
+                const pageHTML = getPageHTML(data.amount, currentPage);
+                $('.comment__page').html('').append(pageHTML);
+            }else{
+                alert('系統錯誤，麻煩請重新確認');
+            }
+            
+        })
+        .catch(err => console.log(err))
 }
 
 // get page HTML
@@ -256,10 +268,10 @@ function getPageHTML(commentCount, pageNum){
         <div class="row justify-content-center">
             <div class="bs-component">
                 <ul class="pagination">
-                    <li class="page-item${preBtn}"><a class="page-link">&laquo;</a></li>
+                    <li class="page-item${preBtn}"><a class="page-link page-pre">&laquo;</a></li>
     `;
     const nextHTML = `
-                    <li class="page-item${nextBtn}"><a class="page-link">&raquo;</a></li>
+                    <li class="page-item${nextBtn}"><a class="page-link page-next">&raquo;</a></li>
                 </ul>
             </div>
         </div>
@@ -268,10 +280,10 @@ function getPageHTML(commentCount, pageNum){
     if(pageTotal >1){
         for(let i=0; i<pageTotal; i++){
             if(i == currentPage){
-                preHTML += `<li class="page-item active"><a class="page-link">${i+1}</a></li>
+                preHTML += `<li class="page-item active"><a class="page-link page-number">${i+1}</a></li>
                 `;
             }else{
-                preHTML += `<li class="page-item"><a class="page-link">${i+1}</a></li>
+                preHTML += `<li class="page-item"><a class="page-link page-number">${i+1}</a></li>
                 `;
             }
         }
@@ -306,18 +318,25 @@ function editDone(e){
     const comment = $(e.target).closest('.comment').children('.card-body').find('.textarea').val();
     const currentPage = $('.page-item.active').text() || 1;
     if(c_id && comment){
-        $.ajax({
-            type: 'PUT',
-            url: '/v1/comments',
-            data: 'cId='+c_id+'&content='+comment,
-            success: function(resp){
-                if(resp === 'success'){
+        fetch('/v1/comments', {
+            method: 'PUT',
+            body: JSON.stringify({
+                cId: c_id,
+                content: comment
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(resp => resp.json())
+            .then(resp => {
+                if(resp.status === 'success'){
                     getIndex(currentPage);
                 }else{
                     alert('系統錯誤，麻煩請重新確認');
                 }
-            }
-        });
+            })
+            .catch(err => console.log(err))
     }
 }
 
@@ -327,18 +346,24 @@ function deleteComment(e){
     
     if(confirmCheck){
         const c_id = $(e.target).prev().prev().val();
-        $.ajax({
-            type: 'DELETE',
-            url: '/v1/comments',
-            data: 'cId='+c_id,
-            success: function(resp){
-                if(resp === 'success'){
+        fetch('/v1/comments', {
+            method: 'DELETE',
+            body: JSON.stringify({
+                cId: c_id
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(resp => resp.json())
+            .then(resp => {
+                if(resp.status === 'success'){
                     const currentPage = $('.page-item.active').text() || 1;
                     getIndex(currentPage);
                 }else{
                     alert('系統錯誤，麻煩請重新確認');
                 }
-            }
-        });
+            })
+            .catch(err => console.log(err))
     }
 }
